@@ -47,9 +47,9 @@ while getopts hd:i:c:t: arg; do
 		h) printf "$HELP"; exit;;
 		d) continue;;
 		i) [[ "$DELIM" ]] || DELIM='\n'
-		   mapfile -t CHORD -d "$DELIM" < "$OPTARG";; 
+		   mapfile -t CHORD <<< `tr "$DELIM" '\n' < "$OPTARG"`;;
 		c) [[ "$DELIM" ]] || DELIM=' '
-		   mapfile -t CHORD -d "$DELIM" <<< "$OPTARG";;
+		   mapfile -t CHORD <<< `tr "$DELIM" '\n' <<< "$OPTARG"`;;
 		t) time="$OPTARG";;
 		*) invalid "$arg";;
 	esac
