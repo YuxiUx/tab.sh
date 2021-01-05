@@ -3,6 +3,7 @@
 CHORD=(A Am D D7 Dm G G7 F E E7 H)
 #DELIM=unset
 time=2
+sep=" "
 
 HELP="\
 usage: $0 [-h] [-t] [-i  chordfile] [-c CHORDS] [-d DELIM]
@@ -12,6 +13,7 @@ usage: $0 [-h] [-t] [-i  chordfile] [-c CHORDS] [-d DELIM]
   -i, --input		chord set from file
   -c, --chords		chord set from string
   -d, --delimiter	(default: -i newline, -c space)
+  -s, --separator	Separator between chords
 Random \"song\" generator\n"
 
 usage() {
@@ -32,6 +34,7 @@ for arg in "$@"; do
 		"--chords")    set -- "$@" "-c";;
 		"--delimiter") set -- "$@" "-d";;
 		"--time")      set -- "$@" "-t";;
+		"--separator") set -- "$@" "-s";;
 		"--"*)         invalid "$arg"  ;;
 		*)             set -- "$@" "$arg";;
 	esac
@@ -42,7 +45,7 @@ grep -wq "\-d" <<< "$@" && {
 	DELIM="${@:$((`printf "%s\n" "$@" | grep -m1 -xn "\-d" | cut -d: -f1` + 1)):1}"
 }
 
-while getopts hd:i:c:t: arg; do
+while getopts hd:i:c:t:s: arg; do
 	case "${arg}" in
 		h) printf "$HELP"; exit;;
 		d) continue;;
@@ -51,13 +54,14 @@ while getopts hd:i:c:t: arg; do
 		c) [[ "$DELIM" ]] || DELIM=' '
 		   mapfile -t CHORD <<< `tr "$DELIM" '\n' <<< "$OPTARG"`;;
 		t) time="$OPTARG";;
+		s) sep="$OPTARG";;
 		*) invalid "$arg";;
 	esac
 done
 
 
 while :; do 
-	echo ${CHORD[$[$RANDOM % ${#CHORD[@]}]]}
+	printf "${CHORD[$[$RANDOM % ${#CHORD[@]}]]}$sep"
 	sleep "$time"
 done
 
