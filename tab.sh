@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 
 accords=(A Am D D7 Dm G G7 F E E7 H)
 
