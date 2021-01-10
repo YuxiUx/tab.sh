@@ -3,7 +3,8 @@
 Shell based random "song" generator for guitar. But can be used for literally anything else.
 
 ```
-usage: tab.sh [-h] [-t delay] [-i  chordfile] [-c CHORDS] [-d DELIM]
+usage: tab.sh [-h] [-t delay] [-i  CHORD_FILE] [-c CHORDS] [-d DELIM]
+              [-s SEP]
 
   -h, --help        print this help
   -t, --time        delay between updates
