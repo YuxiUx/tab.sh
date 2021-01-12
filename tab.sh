@@ -6,11 +6,13 @@ time=2
 sep=" "
 VAR=0
 ISEP=1
+REPEAT=1
+LAST_INDEX=-1
 
 HELP_SPC="       $(tr "[:print:]" ' ' <<< "$0")"
 HELP="\
 usage: $0 [-h] [-t DELAY] [-i  CHORD_FILE] [-c CHORDS] [-d DELIM]
-$HELP_SPC [-s SEP] [-v MAX] [-V]
+$HELP_SPC [-s SEP] [-v MAX] [-V] [-n]
 
   -h, --help		  print this help
   -t, --time      delay between updates
@@ -20,6 +22,7 @@ $HELP_SPC [-s SEP] [-v MAX] [-V]
   -s, --separator	Separator between chords
   -v, --var-speed random delay variation (1..v)times delay
   -V, --var-isep  ignore separator in variable time
+  -n, --norepeat
 Random \"song\" generator
 "
 
@@ -44,6 +47,7 @@ for arg in "$@"; do
 		"--separator") set -- "$@" "-s";;
 		"--var-speed") set -- "$@" "-v";;
 		"--var-isep")  set -- "$@" "-V";;
+		"--norepeat")  set -- "$@" "-n";;
 		"--"*)         invalid "$arg"  ;;
 		*)             set -- "$@" "$arg";;
 	esac
@@ -57,7 +61,7 @@ grep -wq "\-d" <<< "$@" && {
 	}"
 }
 
-while getopts hd:i:c:t:s:v:V arg; do
+while getopts hd:i:c:t:s:v:Vn arg; do
 	case "${arg}" in
 		h) printf %s "$HELP"; exit;;
 		d) continue;;
@@ -69,13 +73,22 @@ while getopts hd:i:c:t:s:v:V arg; do
 		s) sep="$OPTARG";;
 		v) VAR="$OPTARG";;
 		V) ISEP=0;;
+		n) REPEAT=0;;
 		*) invalid "$arg";;
 	esac
 done
 
 getChord() {
-	printf %b "${CHORD[$((RANDOM % ${#CHORD[@]}))]}"
+	while :; do
+		i=$((RANDOM % ${#CHORD[@]}))
+		(( i != LAST_INDEX || REPEAT )) && {
+			LAST_INDEX=$i
+			printf %b "${CHORD[i]}"
+			return
+		}
+	done
 }
+
 timer() {
 	[ "$2" -eq 0 ] && return;
 	for i in $(seq $((RANDOM%$2))); do
